@@ -1,0 +1,6 @@
+@GraphGuard.API_HostAddress = http://localhost:5251
+
+GET {{GraphGuard.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
