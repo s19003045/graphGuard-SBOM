@@ -2,9 +2,11 @@ using GraphGuard.API.Middleware;
 using GraphGuard.API.Security;
 using GraphGuard.API.Workers;
 using GraphGuard.Domain.Audit;
+using GraphGuard.Domain.Graph;
 using GraphGuard.Domain.Sbom;
 using GraphGuard.Infrastructure.Audit;
 using GraphGuard.Infrastructure.Events;
+using GraphGuard.Infrastructure.Graph;
 using GraphGuard.Infrastructure.Sbom;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +20,7 @@ builder.Services.AddSingleton<ISbomSnapshotRepository, SbomSnapshotRepository>()
 builder.Services.AddSingleton<IIngestionQueueService, IngestionQueueService>();
 builder.Services.AddSingleton<IIngestionStatusEventPublisher, IngestionStatusEventPublisher>();
 builder.Services.AddSingleton<IAuditEventRepository, AuditEventRepository>();
+builder.Services.AddSingleton<IDependencyGraphQueryService, DependencyGraphQueryService>();
 builder.Services.AddHostedService<SbomIngestionWorker>();
 
 var app = builder.Build();

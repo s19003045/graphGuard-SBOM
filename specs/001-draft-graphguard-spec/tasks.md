@@ -64,17 +64,17 @@
 - Blast radius endpoint returns separated direct and indirect impact sets.
 - Filter controls update result set while preserving selected context.
 
-- [ ] T033 [US2] Implement dependency node and edge contracts in src/api-server/GraphGuard.API/Contracts/DependencyGraphDtos.cs
-- [ ] T034 [US2] Implement package version and dependency edge entities in src/api-server/GraphGuard.Domain/Graph/DependencyEdge.cs
-- [ ] T035 [US2] Implement graph query service contract in src/api-server/GraphGuard.Domain/Graph/IDependencyGraphQueryService.cs
-- [ ] T036 [US2] Implement graph query service adapter in src/api-server/GraphGuard.Infrastructure/Graph/DependencyGraphQueryService.cs
-- [ ] T037 [US2] Implement project dependency endpoint in src/api-server/GraphGuard.API/Controllers/ProjectDependenciesController.cs
-- [ ] T038 [US2] Implement blast radius endpoint in src/api-server/GraphGuard.API/Controllers/PackageImpactController.cs
-- [ ] T039 [US2] Implement circular dependency detection use case in src/api-server/GraphGuard.Domain/Graph/CycleDetectionService.cs
-- [ ] T040 [P] [US2] Implement dependency explorer page UI in src/web-ui/src/features/dependency-graph/DependencyExplorerPage.tsx
-- [ ] T041 [P] [US2] Implement blast radius impact panel UI in src/web-ui/src/features/dependency-graph/BlastRadiusPanel.tsx
-- [ ] T042 [P] [US2] Implement graph filters and query param sync in src/web-ui/src/features/dependency-graph/useGraphFilters.ts
-- [ ] T043 [US2] Implement impact export action in src/web-ui/src/features/dependency-graph/exportImpactCsv.ts
+- [X] T033 [US2] Implement dependency node and edge contracts in src/api-server/GraphGuard.API/Contracts/DependencyGraphDtos.cs
+- [X] T034 [US2] Implement package version and dependency edge entities in src/api-server/GraphGuard.Domain/Graph/DependencyEdge.cs
+- [X] T035 [US2] Implement graph query service contract in src/api-server/GraphGuard.Domain/Graph/IDependencyGraphQueryService.cs
+- [X] T036 [US2] Implement graph query service adapter in src/api-server/GraphGuard.Infrastructure/Graph/DependencyGraphQueryService.cs
+- [X] T037 [US2] Implement project dependency endpoint in src/api-server/GraphGuard.API/Controllers/ProjectDependenciesController.cs
+- [X] T038 [US2] Implement blast radius endpoint in src/api-server/GraphGuard.API/Controllers/PackageImpactController.cs
+- [X] T039 [US2] Implement circular dependency detection use case in src/api-server/GraphGuard.Domain/Graph/CycleDetectionService.cs
+- [X] T040 [P] [US2] Implement dependency explorer page UI in src/web-ui/src/features/dependency-graph/DependencyExplorerPage.tsx
+- [X] T041 [P] [US2] Implement blast radius impact panel UI in src/web-ui/src/features/dependency-graph/BlastRadiusPanel.tsx
+- [X] T042 [P] [US2] Implement graph filters and query param sync in src/web-ui/src/features/dependency-graph/useGraphFilters.ts
+- [X] T043 [US2] Implement impact export action in src/web-ui/src/features/dependency-graph/exportImpactCsv.ts
 
 ## Phase 5: User Story 3 - Remediation guidance and explainable AI query (P3)
 
