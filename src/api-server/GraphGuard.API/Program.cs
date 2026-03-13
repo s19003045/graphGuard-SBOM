@@ -20,6 +20,8 @@ builder.Services.AddSingleton<ISbomSnapshotRepository, SbomSnapshotRepository>()
 builder.Services.AddSingleton<IIngestionQueueService, IngestionQueueService>();
 builder.Services.AddSingleton<IIngestionStatusEventPublisher, IngestionStatusEventPublisher>();
 builder.Services.AddSingleton<IAuditEventRepository, AuditEventRepository>();
+builder.Services.AddSingleton<IProjectDependencyGraphStore, ProjectDependencyGraphStore>();
+builder.Services.AddSingleton<ISbomGraphProjectionService, SbomGraphProjectionService>();
 builder.Services.AddSingleton<IDependencyGraphQueryService, DependencyGraphQueryService>();
 builder.Services.AddHostedService<SbomIngestionWorker>();
 

@@ -5,6 +5,7 @@ public sealed class SbomSnapshot
     public required string SnapshotId { get; init; }
     public required string ProjectId { get; init; }
     public required string SourceType { get; init; }
+    public required string RawSbomDocument { get; init; }
     public IngestStatus IngestStatus { get; private set; } = IngestStatus.Queued;
     public int PackageCount { get; private set; }
     public int VulnerablePackageCount { get; private set; }

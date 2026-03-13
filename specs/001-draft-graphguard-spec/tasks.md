@@ -54,6 +54,8 @@
 - [X] T030 [P] [US1] Implement SBOM upload page UI in src/web-ui/src/features/sbom-upload/SbomUploadPage.tsx
 - [X] T031 [P] [US1] Implement upload status polling and state store in src/web-ui/src/features/sbom-upload/useSbomUploadStatus.ts
 - [X] T032 [US1] Implement findings summary cards UI in src/web-ui/src/features/dashboard/RiskSummaryCards.tsx
+- [X] T072 [US1] Implement SBOM file picker upload flow (read local .json and submit as sbomDocument) in src/web-ui/src/features/sbom-upload/SbomUploadPage.tsx
+- [X] T073 [US1] Add API-side SBOM payload validation and upload contract hardening for file-based ingestion in src/api-server/GraphGuard.API/Controllers/SbomUploadController.cs
 
 ## Phase 4: User Story 2 - Blast radius and dependency analysis (P2)
 

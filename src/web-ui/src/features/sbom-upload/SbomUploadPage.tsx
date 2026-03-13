@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import {
   Alert,
   Button,
@@ -12,29 +12,42 @@ import {
   TextField,
   Typography
 } from "@mui/material";
+import { useSearchParams } from "react-router-dom";
 import { useSbomUploadStatus } from "./useSbomUploadStatus";
 
 export function SbomUploadPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [projectId, setProjectId] = useState("demo-project");
   const [sourceType, setSourceType] = useState("cyclonedx");
   const [snapshotId, setSnapshotId] = useState<string | null>(null);
+  const [sbomFile, setSbomFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const status = useSbomUploadStatus(snapshotId);
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setSnapshotId(null);
     setIsSubmitting(true);
     setErrorMessage(null);
 
+    if (!sbomFile) {
+      setErrorMessage("Please select an SBOM .json file before uploading.");
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
+      const fileContent = await sbomFile.text();
+      const parsedDocument = JSON.parse(fileContent);
+
       const response = await fetch("/api/v1/sbom/uploads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           projectId,
           sourceType,
-          sbomDocument: { bomFormat: "CycloneDX", components: [] }
+          sbomDocument: parsedDocument
         })
       });
 
@@ -45,11 +58,21 @@ export function SbomUploadPage() {
 
       const data = await response.json();
       setSnapshotId(data.snapshotId);
+
+      const nextParams = new URLSearchParams();
+      nextParams.set("projectId", projectId);
+      nextParams.set("maxDepth", searchParams.get("maxDepth") || "3");
+      setSearchParams(nextParams, { replace: true });
     } catch {
-      setErrorMessage("Network error while uploading SBOM.");
+      setErrorMessage("Upload failed. Ensure the selected file is valid JSON and API is reachable.");
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const onFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] ?? null;
+    setSbomFile(file);
   };
 
   const statusColor =
@@ -90,6 +113,17 @@ export function SbomUploadPage() {
                   <MenuItem value="cyclonedx">CycloneDX</MenuItem>
                   <MenuItem value="spdx">SPDX</MenuItem>
                 </TextField>
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <Button component="label" variant="outlined" fullWidth sx={{ height: "100%" }}>
+                  {sbomFile ? "Change SBOM File" : "Select SBOM File"}
+                  <input type="file" accept=".json,application/json" hidden onChange={onFileChange} />
+                </Button>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Typography variant="body2" color="text.secondary">
+                  {sbomFile ? `Selected file: ${sbomFile.name}` : "No SBOM file selected"}
+                </Typography>
               </Grid>
               <Grid item xs={12} md={3}>
                 <Button type="submit" variant="contained" fullWidth disabled={isSubmitting} sx={{ height: "100%" }}>

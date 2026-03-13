@@ -9,6 +9,7 @@ import {
   FormControl,
   Grid,
   IconButton,
+  TextField,
   InputLabel,
   MenuItem,
   Select,
@@ -17,8 +18,10 @@ import {
   TableBody,
   TableCell,
   TableContainer,
+  TablePagination,
   TableHead,
   TableRow,
+  TableSortLabel,
   Typography
 } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
@@ -50,6 +53,9 @@ type ImpactItem = {
   isDirect: boolean;
 };
 
+type SortKey = "packageName" | "version" | "depth";
+type SortDirection = "asc" | "desc";
+
 export function DependencyExplorerPage() {
   const { filters, setFilters, clearFilters } = useGraphFilters();
 
@@ -60,9 +66,46 @@ export function DependencyExplorerPage() {
   const [nodes, setNodes] = useState<GraphNode[]>([]);
   const [edges, setEdges] = useState<GraphEdge[]>([]);
   const [selectedPackageVersionId, setSelectedPackageVersionId] = useState<string>("pkg-npm-ansi-regex-5.0.1");
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(50);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState<SortKey>("depth");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
   const [directImpacts, setDirectImpacts] = useState<ImpactItem[]>([]);
   const [indirectImpacts, setIndirectImpacts] = useState<ImpactItem[]>([]);
+
+  const visibleNodes = useMemo(() => {
+    const keyword = searchTerm.trim().toLowerCase();
+
+    const filtered = keyword
+      ? nodes.filter(
+          (node) =>
+            node.packageName.toLowerCase().includes(keyword)
+            || node.version.toLowerCase().includes(keyword)
+            || node.packageVersionId.toLowerCase().includes(keyword)
+        )
+      : nodes;
+
+    const sorted = [...filtered].sort((left, right) => {
+      if (sortBy === "depth") {
+        return left.depth - right.depth;
+      }
+
+      if (sortBy === "version") {
+        return left.version.localeCompare(right.version, undefined, { numeric: true, sensitivity: "base" });
+      }
+
+      return left.packageName.localeCompare(right.packageName, undefined, { sensitivity: "base" });
+    });
+
+    return sortDirection === "asc" ? sorted : sorted.reverse();
+  }, [nodes, searchTerm, sortBy, sortDirection]);
+
+  const pagedNodes = useMemo(
+    () => visibleNodes.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
+    [visibleNodes, page, rowsPerPage]
+  );
 
   const queryString = useMemo(() => {
     const params = new URLSearchParams();
@@ -87,7 +130,7 @@ export function DependencyExplorerPage() {
       setErrorMessage(null);
 
       try {
-        const response = await fetch(`/api/v1/projects/sample-project/dependencies?${queryString}`, {
+        const response = await fetch(`/api/v1/projects/${encodeURIComponent(filters.projectId)}/dependencies?${queryString}`, {
           signal: abort.signal
         });
 
@@ -115,10 +158,40 @@ export function DependencyExplorerPage() {
 
     loadGraph();
     return () => abort.abort();
-  }, [queryString]);
+  }, [filters.projectId, queryString]);
+
+  useEffect(() => {
+    if (visibleNodes.length === 0) {
+      setSelectedPackageVersionId("");
+      return;
+    }
+
+    const exists = visibleNodes.some((node) => node.packageVersionId === selectedPackageVersionId);
+    if (!exists) {
+      setSelectedPackageVersionId(visibleNodes[0].packageVersionId);
+    }
+  }, [visibleNodes, selectedPackageVersionId]);
+
+  useEffect(() => {
+    setPage(0);
+  }, [filters.projectId, filters.maxDepth, filters.severityFilter, filters.licenseRiskFilter, searchTerm, sortBy, sortDirection]);
+
+  useEffect(() => {
+    const maxPage = Math.max(0, Math.ceil(visibleNodes.length / rowsPerPage) - 1);
+    if (page > maxPage) {
+      setPage(maxPage);
+    }
+  }, [page, rowsPerPage, visibleNodes]);
 
   useEffect(() => {
     const abort = new AbortController();
+
+    if (!selectedPackageVersionId) {
+      setDirectImpacts([]);
+      setIndirectImpacts([]);
+      setIsLoadingImpact(false);
+      return () => abort.abort();
+    }
 
     async function loadImpact() {
       setIsLoadingImpact(true);
@@ -150,9 +223,7 @@ export function DependencyExplorerPage() {
       }
     }
 
-    if (selectedPackageVersionId) {
-      loadImpact();
-    }
+    loadImpact();
 
     return () => abort.abort();
   }, [selectedPackageVersionId]);
@@ -173,6 +244,14 @@ export function DependencyExplorerPage() {
             </Stack>
 
             <Grid container spacing={2}>
+              <Grid item xs={12} md={4}>
+                <TextField
+                  label="Project ID"
+                  value={filters.projectId}
+                  onChange={(e) => setFilters({ projectId: e.target.value || "demo-project" })}
+                  fullWidth
+                />
+              </Grid>
               <Grid item xs={12} md={4}>
                 <FormControl fullWidth>
                   <InputLabel id="max-depth-label">Max Depth</InputLabel>
@@ -223,6 +302,15 @@ export function DependencyExplorerPage() {
                   </Select>
                 </FormControl>
               </Grid>
+              <Grid item xs={12} md={8}>
+                <TextField
+                  label="Search Package"
+                  placeholder="Search by package name, version, or ID"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  fullWidth
+                />
+              </Grid>
             </Grid>
 
             {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
@@ -233,20 +321,68 @@ export function DependencyExplorerPage() {
                 <Typography variant="body2">Loading graph...</Typography>
               </Stack>
             ) : (
-              <TableContainer>
-                <Table size="small">
+              <TableContainer sx={{ maxHeight: 420 }}>
+                <Table size="small" stickyHeader>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Package</TableCell>
-                      <TableCell>Version</TableCell>
-                      <TableCell>Depth</TableCell>
+                      <TableCell>
+                        <TableSortLabel
+                          active={sortBy === "packageName"}
+                          direction={sortBy === "packageName" ? sortDirection : "asc"}
+                          onClick={() => {
+                            if (sortBy === "packageName") {
+                              setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+                              return;
+                            }
+
+                            setSortBy("packageName");
+                            setSortDirection("asc");
+                          }}
+                        >
+                          Package
+                        </TableSortLabel>
+                      </TableCell>
+                      <TableCell>
+                        <TableSortLabel
+                          active={sortBy === "version"}
+                          direction={sortBy === "version" ? sortDirection : "asc"}
+                          onClick={() => {
+                            if (sortBy === "version") {
+                              setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+                              return;
+                            }
+
+                            setSortBy("version");
+                            setSortDirection("asc");
+                          }}
+                        >
+                          Version
+                        </TableSortLabel>
+                      </TableCell>
+                      <TableCell>
+                        <TableSortLabel
+                          active={sortBy === "depth"}
+                          direction={sortBy === "depth" ? sortDirection : "asc"}
+                          onClick={() => {
+                            if (sortBy === "depth") {
+                              setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+                              return;
+                            }
+
+                            setSortBy("depth");
+                            setSortDirection("asc");
+                          }}
+                        >
+                          Depth
+                        </TableSortLabel>
+                      </TableCell>
                       <TableCell>Severity</TableCell>
                       <TableCell>License Risk</TableCell>
                       <TableCell>Path Type</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {nodes.map((node) => (
+                    {pagedNodes.map((node) => (
                       <TableRow
                         key={node.packageVersionId}
                         hover
@@ -264,11 +400,11 @@ export function DependencyExplorerPage() {
                         <TableCell>{node.isDirect ? "Direct" : "Indirect"}</TableCell>
                       </TableRow>
                     ))}
-                    {nodes.length === 0 && (
+                    {visibleNodes.length === 0 && (
                       <TableRow>
                         <TableCell colSpan={6}>
                           <Typography variant="body2" color="text.secondary">
-                            No graph nodes available for current filter set.
+                            No graph nodes available for current filter/search set.
                           </Typography>
                         </TableCell>
                       </TableRow>
@@ -278,8 +414,23 @@ export function DependencyExplorerPage() {
               </TableContainer>
             )}
 
+            {visibleNodes.length > 0 && (
+              <TablePagination
+                component="div"
+                count={visibleNodes.length}
+                page={page}
+                onPageChange={(_, nextPage) => setPage(nextPage)}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={(event) => {
+                  setRowsPerPage(Number(event.target.value));
+                  setPage(0);
+                }}
+                rowsPerPageOptions={[25, 50, 100]}
+              />
+            )}
+
             <Typography variant="caption" color="text.secondary">
-              Edges in current graph window: {edges.length}
+              Nodes in current graph window: {visibleNodes.length} (filtered from {nodes.length}) | Edges in current graph window: {edges.length}
             </Typography>
           </Stack>
         </CardContent>

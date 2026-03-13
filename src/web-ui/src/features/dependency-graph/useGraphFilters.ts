@@ -5,12 +5,14 @@ type GraphSeverity = "critical" | "high" | "medium" | "low";
 type LicenseRisk = "high" | "medium" | "low";
 
 export type GraphFilters = {
+  projectId: string;
   maxDepth: number;
   severityFilter?: GraphSeverity;
   licenseRiskFilter?: LicenseRisk;
 };
 
 const DEFAULT_MAX_DEPTH = 3;
+const DEFAULT_PROJECT_ID = "demo-project";
 
 export function useGraphFilters() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -23,6 +25,7 @@ export function useGraphFilters() {
     const licenseRaw = searchParams.get("licenseRiskFilter") ?? undefined;
 
     return {
+      projectId: searchParams.get("projectId") || DEFAULT_PROJECT_ID,
       maxDepth,
       severityFilter: toSeverity(severityRaw),
       licenseRiskFilter: toLicenseRisk(licenseRaw)
@@ -36,6 +39,7 @@ export function useGraphFilters() {
     };
 
     const nextParams = new URLSearchParams();
+    nextParams.set("projectId", merged.projectId);
     nextParams.set("maxDepth", String(merged.maxDepth));
 
     if (merged.severityFilter) {
@@ -50,7 +54,13 @@ export function useGraphFilters() {
   };
 
   const clearFilters = () => {
-    setSearchParams(new URLSearchParams([["maxDepth", String(DEFAULT_MAX_DEPTH)]]), { replace: true });
+    setSearchParams(
+      new URLSearchParams([
+        ["projectId", filters.projectId],
+        ["maxDepth", String(DEFAULT_MAX_DEPTH)]
+      ]),
+      { replace: true }
+    );
   };
 
   return { filters, setFilters, clearFilters };
