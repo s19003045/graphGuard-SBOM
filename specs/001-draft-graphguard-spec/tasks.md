@@ -108,17 +108,17 @@
 - Exception updates create immutable audit entries.
 - Compliance export contains actor, action, target, and timestamp metadata.
 
-- [ ] T055 [US4] Implement vulnerability and license finding entities in src/api-server/GraphGuard.Domain/Findings/VulnerabilityFinding.cs
-- [ ] T056 [US4] Implement risk exception entity and state transitions in src/api-server/GraphGuard.Domain/Exceptions/RiskException.cs
-- [ ] T057 [US4] Implement exception command contracts in src/api-server/GraphGuard.API/Contracts/RiskExceptionDtos.cs
-- [ ] T058 [US4] Implement exception service contract in src/api-server/GraphGuard.Domain/Exceptions/IRiskExceptionService.cs
-- [ ] T059 [US4] Implement exception service adapter in src/api-server/GraphGuard.Infrastructure/Exceptions/RiskExceptionService.cs
-- [ ] T060 [US4] Implement exception create and update endpoints in src/api-server/GraphGuard.API/Controllers/RiskExceptionController.cs
-- [ ] T061 [US4] Implement compliance report export endpoint in src/api-server/GraphGuard.API/Controllers/ComplianceReportController.cs
-- [ ] T062 [P] [US4] Implement compliance dashboard page UI in src/web-ui/src/features/compliance/ComplianceDashboardPage.tsx
-- [ ] T063 [P] [US4] Implement exception management form UI in src/web-ui/src/features/compliance/RiskExceptionForm.tsx
-- [ ] T064 [P] [US4] Implement audit timeline table UI in src/web-ui/src/features/compliance/AuditTimelineTable.tsx
-- [ ] T065 [US4] Implement compliance export action UI in src/web-ui/src/features/compliance/ExportComplianceButton.tsx
+- [X] T055 [US4] Implement vulnerability and license finding entities in src/api-server/GraphGuard.Domain/Findings/VulnerabilityFinding.cs
+- [X] T056 [US4] Implement risk exception entity and state transitions in src/api-server/GraphGuard.Domain/Exceptions/RiskException.cs
+- [X] T057 [US4] Implement exception command contracts in src/api-server/GraphGuard.API/Contracts/RiskExceptionDtos.cs
+- [X] T058 [US4] Implement exception service contract in src/api-server/GraphGuard.Domain/Exceptions/IRiskExceptionService.cs
+- [X] T059 [US4] Implement exception service adapter in src/api-server/GraphGuard.Infrastructure/Exceptions/RiskExceptionService.cs
+- [X] T060 [US4] Implement exception create and update endpoints in src/api-server/GraphGuard.API/Controllers/RiskExceptionController.cs
+- [X] T061 [US4] Implement compliance report export endpoint in src/api-server/GraphGuard.API/Controllers/ComplianceReportController.cs
+- [X] T062 [P] [US4] Implement compliance dashboard page UI in src/web-ui/src/features/compliance/ComplianceDashboardPage.tsx
+- [X] T063 [P] [US4] Implement exception management form UI in src/web-ui/src/features/compliance/RiskExceptionForm.tsx
+- [X] T064 [P] [US4] Implement audit timeline table UI in src/web-ui/src/features/compliance/AuditTimelineTable.tsx
+- [X] T065 [US4] Implement compliance export action UI in src/web-ui/src/features/compliance/ExportComplianceButton.tsx
 
 ## Phase 7: Polish and Cross-Cutting
 

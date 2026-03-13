@@ -12,4 +12,6 @@ public sealed record AuditEvent(
 public interface IAuditEventRepository
 {
     Task AppendAsync(AuditEvent auditEvent, CancellationToken cancellationToken);
+
+    Task<IReadOnlyList<AuditEvent>> GetAllAsync(CancellationToken cancellationToken);
 }

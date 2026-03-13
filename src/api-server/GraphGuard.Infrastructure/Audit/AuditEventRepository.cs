@@ -11,4 +11,9 @@ public sealed class AuditEventRepository : IAuditEventRepository
         Events.Add(auditEvent);
         return Task.CompletedTask;
     }
+
+    public Task<IReadOnlyList<AuditEvent>> GetAllAsync(CancellationToken cancellationToken)
+    {
+        return Task.FromResult<IReadOnlyList<AuditEvent>>(Events.ToArray());
+    }
 }
