@@ -1,11 +1,9 @@
 import HubOutlinedIcon from "@mui/icons-material/HubOutlined";
 import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
 import {
-  Alert,
   Card,
   CardContent,
   Chip,
-  CircularProgress,
   FormControl,
   Grid,
   IconButton,
@@ -25,6 +23,8 @@ import {
   Typography
 } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
+import { buildPackageRowA11yLabel, getInteractiveRowA11yProps } from "../../shared/accessibility/a11yEnhancements";
+import { AsyncState } from "../../shared/ui/AsyncState";
 import { BlastRadiusPanel } from "./BlastRadiusPanel";
 import { useGraphFilters } from "./useGraphFilters";
 
@@ -313,13 +313,10 @@ export function DependencyExplorerPage() {
               </Grid>
             </Grid>
 
-            {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+            {errorMessage && <AsyncState isLoading={false} errorMessage={errorMessage} />}
 
             {isLoadingGraph ? (
-              <Stack direction="row" spacing={1} alignItems="center">
-                <CircularProgress size={18} />
-                <Typography variant="body2">Loading graph...</Typography>
-              </Stack>
+              <AsyncState isLoading loadingText="Loading graph..." />
             ) : (
               <TableContainer sx={{ maxHeight: 420 }}>
                 <Table size="small" stickyHeader>
@@ -388,6 +385,11 @@ export function DependencyExplorerPage() {
                         hover
                         selected={selectedPackageVersionId === node.packageVersionId}
                         onClick={() => setSelectedPackageVersionId(node.packageVersionId)}
+                        {...getInteractiveRowA11yProps({
+                          selected: selectedPackageVersionId === node.packageVersionId,
+                          label: buildPackageRowA11yLabel(node.packageName, node.version, node.isDirect),
+                          onActivate: () => setSelectedPackageVersionId(node.packageVersionId)
+                        })}
                         sx={{ cursor: "pointer" }}
                       >
                         <TableCell>{node.packageName}</TableCell>
@@ -439,10 +441,7 @@ export function DependencyExplorerPage() {
       {isLoadingImpact ? (
         <Card>
           <CardContent>
-            <Stack direction="row" spacing={1} alignItems="center">
-              <CircularProgress size={18} />
-              <Typography variant="body2">Loading blast radius...</Typography>
-            </Stack>
+            <AsyncState isLoading loadingText="Loading blast radius..." />
           </CardContent>
         </Card>
       ) : (

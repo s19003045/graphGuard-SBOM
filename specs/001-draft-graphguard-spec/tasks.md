@@ -124,12 +124,12 @@
 
 **Goal**: Complete operational hardening, quality gates, and release readiness checks.
 
-- [ ] T066 Add health and readiness endpoints in src/api-server/GraphGuard.API/Controllers/HealthController.cs
-- [ ] T067 Implement structured logging enrichment and correlation in src/api-server/GraphGuard.API/Observability/LoggingConfiguration.cs
-- [ ] T068 Add API rate limiting and abuse safeguards in src/api-server/GraphGuard.API/Security/RateLimitingConfiguration.cs
-- [ ] T069 Add frontend loading and empty state standards in src/web-ui/src/shared/ui/AsyncState.tsx
-- [ ] T070 Add accessibility and keyboard interaction refinements for graph and dialogs in src/web-ui/src/shared/accessibility/a11yEnhancements.ts
-- [ ] T071 Add release checklist and rollout notes in docs/release-checklist.md
+- [X] T066 Add health and readiness endpoints in src/api-server/GraphGuard.API/Controllers/HealthController.cs
+- [X] T067 Implement structured logging enrichment and correlation in src/api-server/GraphGuard.API/Observability/LoggingConfiguration.cs
+- [X] T068 Add API rate limiting and abuse safeguards in src/api-server/GraphGuard.API/Security/RateLimitingConfiguration.cs
+- [X] T069 Add frontend loading and empty state standards in src/web-ui/src/shared/ui/AsyncState.tsx
+- [X] T070 Add accessibility and keyboard interaction refinements for graph and dialogs in src/web-ui/src/shared/accessibility/a11yEnhancements.ts
+- [X] T071 Add release checklist and rollout notes in docs/release-checklist.md
 
 ## Dependencies and Execution Order
 

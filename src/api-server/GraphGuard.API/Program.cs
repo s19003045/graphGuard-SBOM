@@ -1,4 +1,5 @@
 using GraphGuard.API.Middleware;
+using GraphGuard.API.Observability;
 using GraphGuard.API.Security;
 using GraphGuard.API.Workers;
 using GraphGuard.AI.Services;
@@ -18,6 +19,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 builder.Services.AddGraphGuardAuth();
+builder.Services.AddGraphGuardLogging();
+builder.Services.AddGraphGuardRateLimiting();
 
 builder.Services.AddSingleton<ISbomSnapshotRepository, SbomSnapshotRepository>();
 builder.Services.AddSingleton<IIngestionQueueService, IngestionQueueService>();
@@ -34,6 +37,8 @@ builder.Services.AddHostedService<SbomIngestionWorker>();
 var app = builder.Build();
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
+app.UseGraphGuardCorrelationId();
+app.UseRateLimiter();
 app.UseAuthorization();
 
 if (app.Environment.IsDevelopment())
