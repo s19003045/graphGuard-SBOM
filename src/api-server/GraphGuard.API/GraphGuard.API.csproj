@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\ai-service\GraphGuard.AI\GraphGuard.AI.csproj" />
     <ProjectReference Include="..\GraphGuard.Domain\GraphGuard.Domain.csproj" />
     <ProjectReference Include="..\GraphGuard.Infrastructure\GraphGuard.Infrastructure.csproj" />
   </ItemGroup>

@@ -87,17 +87,17 @@
 - Natural language query endpoint returns answer with evidence metadata.
 - UI allows copy-ready remediation instructions for selected option.
 
-- [ ] T044 [US3] Implement remediation recommendation contract in src/api-server/GraphGuard.API/Contracts/RemediationDtos.cs
-- [ ] T045 [US3] Implement recommendation domain entity in src/api-server/GraphGuard.Domain/Remediation/RemediationRecommendation.cs
-- [ ] T046 [US3] Implement AI recommendation service contract in src/ai-service/GraphGuard.AI/Services/IRemediationService.cs
-- [ ] T047 [US3] Implement recommendation generation service in src/ai-service/GraphGuard.AI/Services/RemediationService.cs
-- [ ] T048 [US3] Implement remediation API endpoint in src/api-server/GraphGuard.API/Controllers/RemediationController.cs
-- [ ] T049 [US3] Implement natural language query contract in src/api-server/GraphGuard.API/Contracts/NaturalLanguageQueryDtos.cs
-- [ ] T050 [US3] Implement NL query orchestration service in src/ai-service/GraphGuard.AI/Services/NaturalLanguageQueryService.cs
-- [ ] T051 [US3] Implement natural language query endpoint in src/api-server/GraphGuard.API/Controllers/NaturalLanguageQueryController.cs
-- [ ] T052 [P] [US3] Implement CVE detail side panel UI in src/web-ui/src/features/remediation/CveDetailPanel.tsx
-- [ ] T053 [P] [US3] Implement remediation options dialog UI in src/web-ui/src/features/remediation/RemediationDialog.tsx
-- [ ] T054 [P] [US3] Implement natural language query widget UI in src/web-ui/src/features/remediation/NaturalLanguageQueryWidget.tsx
+- [X] T044 [US3] Implement remediation recommendation contract in src/api-server/GraphGuard.API/Contracts/RemediationDtos.cs
+- [X] T045 [US3] Implement recommendation domain entity in src/api-server/GraphGuard.Domain/Remediation/RemediationRecommendation.cs
+- [X] T046 [US3] Implement AI recommendation service contract in src/ai-service/GraphGuard.AI/Services/IRemediationService.cs
+- [X] T047 [US3] Implement recommendation generation service in src/ai-service/GraphGuard.AI/Services/RemediationService.cs
+- [X] T048 [US3] Implement remediation API endpoint in src/api-server/GraphGuard.API/Controllers/RemediationController.cs
+- [X] T049 [US3] Implement natural language query contract in src/api-server/GraphGuard.API/Contracts/NaturalLanguageQueryDtos.cs
+- [X] T050 [US3] Implement NL query orchestration service in src/ai-service/GraphGuard.AI/Services/NaturalLanguageQueryService.cs
+- [X] T051 [US3] Implement natural language query endpoint in src/api-server/GraphGuard.API/Controllers/NaturalLanguageQueryController.cs
+- [X] T052 [P] [US3] Implement CVE detail side panel UI in src/web-ui/src/features/remediation/CveDetailPanel.tsx
+- [X] T053 [P] [US3] Implement remediation options dialog UI in src/web-ui/src/features/remediation/RemediationDialog.tsx
+- [X] T054 [P] [US3] Implement natural language query widget UI in src/web-ui/src/features/remediation/NaturalLanguageQueryWidget.tsx
 
 ## Phase 6: User Story 4 - Compliance exception and audit export (P4)
 

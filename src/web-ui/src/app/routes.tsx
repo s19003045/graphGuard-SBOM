@@ -4,6 +4,9 @@ import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import { alpha, Box, Chip, Container, IconButton, Stack, Tooltip, Typography, useTheme } from "@mui/material";
 import { RiskSummaryCards } from "../features/dashboard/RiskSummaryCards";
 import { DependencyExplorerPage } from "../features/dependency-graph/DependencyExplorerPage";
+import { CveDetailPanel } from "../features/remediation/CveDetailPanel";
+import { NaturalLanguageQueryWidget } from "../features/remediation/NaturalLanguageQueryWidget";
+import { RemediationDialog } from "../features/remediation/RemediationDialog";
 import { SbomUploadPage } from "../features/sbom-upload/SbomUploadPage";
 import { AppThemeMode } from "../theme/graphGuardTheme";
 
@@ -43,6 +46,15 @@ function ProtectedLayout({ themeMode, onToggleThemeMode }: AppRoutesProps) {
           <RiskSummaryCards />
           <SbomUploadPage />
           <DependencyExplorerPage />
+          <CveDetailPanel
+            cveId="CVE-2026-12345"
+            severity="high"
+            affectedPackage="lodash@4.17.15"
+            summary="Prototype pollution risk in vulnerable lodash versions when untrusted input is merged without validation."
+            vector="network"
+          />
+          <RemediationDialog findingId="CVE-2026-12345" projectContext="demo-project" />
+          <NaturalLanguageQueryWidget />
         </Stack>
       </Container>
     </Box>

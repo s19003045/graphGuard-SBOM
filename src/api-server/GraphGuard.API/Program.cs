@@ -1,6 +1,7 @@
 using GraphGuard.API.Middleware;
 using GraphGuard.API.Security;
 using GraphGuard.API.Workers;
+using GraphGuard.AI.Services;
 using GraphGuard.Domain.Audit;
 using GraphGuard.Domain.Graph;
 using GraphGuard.Domain.Sbom;
@@ -23,6 +24,8 @@ builder.Services.AddSingleton<IAuditEventRepository, AuditEventRepository>();
 builder.Services.AddSingleton<IProjectDependencyGraphStore, ProjectDependencyGraphStore>();
 builder.Services.AddSingleton<ISbomGraphProjectionService, SbomGraphProjectionService>();
 builder.Services.AddSingleton<IDependencyGraphQueryService, DependencyGraphQueryService>();
+builder.Services.AddSingleton<IRemediationService, RemediationService>();
+builder.Services.AddSingleton<INaturalLanguageQueryService, NaturalLanguageQueryService>();
 builder.Services.AddHostedService<SbomIngestionWorker>();
 
 var app = builder.Build();
