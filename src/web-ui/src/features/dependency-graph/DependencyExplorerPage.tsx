@@ -1,6 +1,7 @@
 import HubOutlinedIcon from "@mui/icons-material/HubOutlined";
 import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
 import {
+  Box,
   Card,
   CardContent,
   Chip,
@@ -26,32 +27,9 @@ import { useEffect, useMemo, useState } from "react";
 import { buildPackageRowA11yLabel, getInteractiveRowA11yProps } from "../../shared/accessibility/a11yEnhancements";
 import { AsyncState } from "../../shared/ui/AsyncState";
 import { BlastRadiusPanel } from "./BlastRadiusPanel";
+import { DependencyGraphCanvas } from "./DependencyGraphCanvas";
+import type { GraphEdge, GraphNode, ImpactItem } from "./types";
 import { useGraphFilters } from "./useGraphFilters";
-
-type GraphNode = {
-  packageVersionId: string;
-  ecosystem: string;
-  packageName: string;
-  version: string;
-  depth: number;
-  isDirect: boolean;
-  severity?: string;
-  licenseRisk?: string;
-};
-
-type GraphEdge = {
-  fromPackageVersionId: string;
-  toPackageVersionId: string;
-  depth: number;
-  isDirect: boolean;
-};
-
-type ImpactItem = {
-  projectId: string;
-  impactPath: string;
-  depth: number;
-  isDirect: boolean;
-};
 
 type SortKey = "packageName" | "version" | "depth";
 type SortDirection = "asc" | "desc";
@@ -318,8 +296,17 @@ export function DependencyExplorerPage() {
             {isLoadingGraph ? (
               <AsyncState isLoading loadingText="Loading graph..." />
             ) : (
-              <TableContainer sx={{ maxHeight: 420 }}>
-                <Table size="small" stickyHeader>
+              <>
+                <Box sx={{ mb: 2 }}>
+                  <DependencyGraphCanvas
+                    nodes={visibleNodes}
+                    edges={edges}
+                    selectedPackageVersionId={selectedPackageVersionId}
+                    onSelectNode={setSelectedPackageVersionId}
+                  />
+                </Box>
+                <TableContainer sx={{ maxHeight: 420 }}>
+                  <Table size="small" stickyHeader>
                   <TableHead>
                     <TableRow>
                       <TableCell>
@@ -377,43 +364,44 @@ export function DependencyExplorerPage() {
                       <TableCell>License Risk</TableCell>
                       <TableCell>Path Type</TableCell>
                     </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {pagedNodes.map((node) => (
-                      <TableRow
-                        key={node.packageVersionId}
-                        hover
-                        selected={selectedPackageVersionId === node.packageVersionId}
-                        onClick={() => setSelectedPackageVersionId(node.packageVersionId)}
-                        {...getInteractiveRowA11yProps({
-                          selected: selectedPackageVersionId === node.packageVersionId,
-                          label: buildPackageRowA11yLabel(node.packageName, node.version, node.isDirect),
-                          onActivate: () => setSelectedPackageVersionId(node.packageVersionId)
-                        })}
-                        sx={{ cursor: "pointer" }}
-                      >
-                        <TableCell>{node.packageName}</TableCell>
-                        <TableCell>{node.version}</TableCell>
-                        <TableCell>{node.depth}</TableCell>
-                        <TableCell>
-                          {node.severity ? <Chip size="small" label={node.severity} color="warning" /> : "-"}
-                        </TableCell>
-                        <TableCell>{node.licenseRisk ?? "-"}</TableCell>
-                        <TableCell>{node.isDirect ? "Direct" : "Indirect"}</TableCell>
-                      </TableRow>
-                    ))}
-                    {visibleNodes.length === 0 && (
-                      <TableRow>
-                        <TableCell colSpan={6}>
-                          <Typography variant="body2" color="text.secondary">
-                            No graph nodes available for current filter/search set.
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                    </TableHead>
+                    <TableBody>
+                      {pagedNodes.map((node) => (
+                        <TableRow
+                          key={node.packageVersionId}
+                          hover
+                          selected={selectedPackageVersionId === node.packageVersionId}
+                          onClick={() => setSelectedPackageVersionId(node.packageVersionId)}
+                          {...getInteractiveRowA11yProps({
+                            selected: selectedPackageVersionId === node.packageVersionId,
+                            label: buildPackageRowA11yLabel(node.packageName, node.version, node.isDirect),
+                            onActivate: () => setSelectedPackageVersionId(node.packageVersionId)
+                          })}
+                          sx={{ cursor: "pointer" }}
+                        >
+                          <TableCell>{node.packageName}</TableCell>
+                          <TableCell>{node.version}</TableCell>
+                          <TableCell>{node.depth}</TableCell>
+                          <TableCell>
+                            {node.severity ? <Chip size="small" label={node.severity} color="warning" /> : "-"}
+                          </TableCell>
+                          <TableCell>{node.licenseRisk ?? "-"}</TableCell>
+                          <TableCell>{node.isDirect ? "Direct" : "Indirect"}</TableCell>
+                        </TableRow>
+                      ))}
+                      {visibleNodes.length === 0 && (
+                        <TableRow>
+                          <TableCell colSpan={6}>
+                            <Typography variant="body2" color="text.secondary">
+                              No graph nodes available for current filter/search set.
+                            </Typography>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </>
             )}
 
             {visibleNodes.length > 0 && (
