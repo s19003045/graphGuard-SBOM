@@ -113,6 +113,19 @@ export function DependencyGraphCanvas({
         onSelectNode?.(datum.packageVersionId);
       });
 
+    const label = graphLayer
+      .append("g")
+      .attr("font-size", 10)
+      .attr("font-family", "system-ui, -apple-system, Segoe UI, Roboto, sans-serif")
+      .selectAll("text")
+      .data(graphNodes)
+      .join("text")
+      .attr("fill", GRAPH_CANVAS_COLORS.label)
+      .attr("pointer-events", "none")
+      .text((d) => buildNodeLabel(d.packageName, d.version, d.ecosystem));
+
+    let zoomScale = 1;
+
     const simulation = forceSimulation(graphNodes)
       .force("link", forceLink(graphLinks).id((d) => d.packageVersionId).distance(58))
       .force("charge", forceManyBody().strength(-120))
@@ -125,6 +138,15 @@ export function DependencyGraphCanvas({
           .attr("y2", (d) => (d.target as GraphSimulationNode).y ?? 0);
 
         node.attr("cx", (d) => d.x ?? 0).attr("cy", (d) => d.y ?? 0);
+
+        const visibleLabelIds = computeVisibleLabelIds(graphNodes, selectedPackageVersionId, zoomScale);
+
+        label
+          .attr("x", (d) => (d.x ?? 0) + 9)
+          .attr("y", (d) => (d.y ?? 0) + 3)
+          .attr("display", (d) => (visibleLabelIds.has(d.packageVersionId) ? null : "none"))
+          .attr("opacity", (d) => (d.packageVersionId === selectedPackageVersionId ? 1 : 0.8))
+          .attr("font-weight", (d) => (d.ecosystem === "project" ? 700 : 400));
       });
 
     const dragBehavior = drag<SVGCircleElement, GraphSimulationNode>()
@@ -152,6 +174,7 @@ export function DependencyGraphCanvas({
     const zoomBehavior = zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.4, 3.5])
       .on("zoom", (event) => {
+        zoomScale = event.transform.k;
         graphLayer.attr("transform", String(event.transform));
       });
 
@@ -183,4 +206,61 @@ function isConnectedToSelected(link: GraphSimulationLink, selectedPackageVersion
   const sourceId = typeof link.source === "string" ? link.source : link.source.packageVersionId;
   const targetId = typeof link.target === "string" ? link.target : link.target.packageVersionId;
   return sourceId === selectedPackageVersionId || targetId === selectedPackageVersionId;
+}
+
+function buildNodeLabel(packageName: string, version: string, ecosystem: string) {
+  if (ecosystem === "project") {
+    return truncateLabel(`project:${packageName}`, 28);
+  }
+
+  if (version && version !== "n/a") {
+    return truncateLabel(`${packageName}@${version}`, 28);
+  }
+
+  return truncateLabel(packageName, 28);
+}
+
+function truncateLabel(text: string, limit: number) {
+  if (text.length <= limit) {
+    return text;
+  }
+
+  return `${text.slice(0, limit - 1)}...`;
+}
+
+function computeVisibleLabelIds(nodes: GraphSimulationNode[], selectedPackageVersionId: string | undefined, zoomScale: number) {
+  const visible = new Set<string>();
+  const occupiedGrid = new Set<string>();
+
+  const gridSize = zoomScale < 0.8 ? 120 : zoomScale < 1.2 ? 74 : 48;
+
+  for (const node of nodes) {
+    const id = node.packageVersionId;
+
+    if (id === selectedPackageVersionId || node.ecosystem === "project") {
+      visible.add(id);
+      continue;
+    }
+
+    if (node.x === undefined || node.y === undefined) {
+      continue;
+    }
+
+    if (zoomScale < 0.75 && node.depth > 1) {
+      continue;
+    }
+
+    const gx = Math.floor(node.x / gridSize);
+    const gy = Math.floor(node.y / gridSize);
+    const key = `${gx}:${gy}`;
+
+    if (occupiedGrid.has(key)) {
+      continue;
+    }
+
+    occupiedGrid.add(key);
+    visible.add(id);
+  }
+
+  return visible;
 }
