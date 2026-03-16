@@ -13,7 +13,33 @@ export function DependencyGraphCanvas({
 }: GraphCanvasProps) {
   const svgRef = useRef<SVGSVGElement | null>(null);
 
-  const graphNodes = useMemo<GraphSimulationNode[]>(() => nodes.map((node) => ({ ...node })), [nodes]);
+  const baseNodes = useMemo<GraphSimulationNode[]>(() => nodes.map((node) => ({ ...node })), [nodes]);
+
+  const syntheticNodes = useMemo<GraphSimulationNode[]>(() => {
+    const existingIds = new Set(baseNodes.map((node) => node.packageVersionId));
+    const missingIds = new Set<string>();
+
+    for (const edge of edges) {
+      if (!existingIds.has(edge.fromPackageVersionId)) {
+        missingIds.add(edge.fromPackageVersionId);
+      }
+
+      if (!existingIds.has(edge.toPackageVersionId)) {
+        missingIds.add(edge.toPackageVersionId);
+      }
+    }
+
+    return Array.from(missingIds).map((id) => ({
+      packageVersionId: id,
+      ecosystem: id.startsWith("project-") ? "project" : "unknown",
+      packageName: id.startsWith("project-") ? id.replace(/^project-/, "") : id,
+      version: "n/a",
+      depth: 0,
+      isDirect: true
+    }));
+  }, [baseNodes, edges]);
+
+  const graphNodes = useMemo<GraphSimulationNode[]>(() => [...baseNodes, ...syntheticNodes], [baseNodes, syntheticNodes]);
 
   const nodeIdSet = useMemo(() => new Set(graphNodes.map((node) => node.packageVersionId)), [graphNodes]);
 
@@ -67,7 +93,21 @@ export function DependencyGraphCanvas({
       .data(graphNodes)
       .join("circle")
       .attr("r", 6)
-      .attr("fill", (d) => (d.packageVersionId === selectedPackageVersionId ? GRAPH_CANVAS_COLORS.selected : GRAPH_CANVAS_COLORS.node))
+      .attr("fill", (d) => {
+        if (d.packageVersionId === selectedPackageVersionId) {
+          return GRAPH_CANVAS_COLORS.selected;
+        }
+
+        if (d.ecosystem === "project") {
+          return "#0f766e";
+        }
+
+        if (d.ecosystem === "unknown") {
+          return "#64748b";
+        }
+
+        return GRAPH_CANVAS_COLORS.node;
+      })
       .style("cursor", "pointer")
       .on("click", (_, datum) => {
         onSelectNode?.(datum.packageVersionId);
